@@ -65,11 +65,11 @@ char** render(int** state, int width, int height)
 
 int main()
 {
-    int** state = randomState(4,3);
-    char** board = render(state, 4,3);
+    int** state = randomState(30,50);
+    char** board = render(state, 30,50);
     // print multidimensional array
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 4; j++) {
+    for (int i = 0; i < 50; i++) {
+        for (int j = 0; j < 30; j++) {
             std::cout << board[i][j] << " ";
         }
         std::cout << std::endl;
