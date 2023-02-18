@@ -121,6 +121,7 @@ char **render(int **state, int width, int height)
     return renderedState;
 }
 
+//  Infinite loop
 void infinite(int width, int height)
 {
     int **boardState = randomState(width, height);
