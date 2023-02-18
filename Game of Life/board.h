@@ -1,5 +1,7 @@
 #include <cstdlib>
 #include <time.h>
+#include <windows.h>
+#include <unistd.h>
 using namespace std;
 
 //  Generate an empty board using width and height parameters
@@ -21,7 +23,7 @@ int **deadState(int width, int height)
 int randomInt()
 {
     int randomValue = rand();
-    if (randomValue % 2 == 0)
+    if (randomValue % 2 == 0 || randomValue % 3 == 0 || randomValue % 5 == 0)
     {
         return 0;
     }
@@ -48,8 +50,8 @@ int **randomState(int width, int height)
     return state;
 }
 
-//  Calculate the next state of the board using Life's rules 
-int **nextBoardState(int** initialState, int width, int height)
+//  Calculate the next state of the board using Life's rules
+int **nextBoardState(int **initialState, int width, int height)
 {
     int **nextState = initialState;
 
@@ -92,24 +94,50 @@ int **nextBoardState(int** initialState, int width, int height)
             }
         }
     }
-    
+
     return nextState;
 }
 
 //  Pretty type the board changing the 0 to empty spaces and the 1 to #
-char** render(int** state, int width, int height) 
+char **render(int **state, int width, int height)
 {
-    char** renderedState = new char*[height];
-    for (int i = 0; i < height; i++){
+    char **renderedState = new char *[height];
+    for (int i = 0; i < height; i++)
+    {
         renderedState[i] = new char[width];
-        for (int j = 0; j < width; j++){
-            if (state[i][j] == 1) {
+        for (int j = 0; j < width; j++)
+        {
+            if (state[i][j] == 1)
+            {
                 renderedState[i][j] = '#';
-            } else {
+            }
+            else
+            {
                 renderedState[i][j] = ' ';
             }
         }
     }
 
     return renderedState;
+}
+
+void infinite(int width, int height)
+{
+    int **boardState = randomState(width, height);
+    char **renderedBoard = render(boardState, width, height);
+    while (true)
+    {
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                cout << renderedBoard[i][j];
+            }
+            cout << endl;
+        }
+        
+        boardState = nextBoardState(boardState, width, height);
+        renderedBoard = render(boardState, width, height);
+        sleep(0.999);
+    }
 }
