@@ -4,14 +4,14 @@ using namespace std;
 
 int main()
 {
-    int** state = randomState(30,50);
-    char** board = render(state, 30,50);
+    int** state = randomState(3,3);
+    char** board = render(state, 3,3);
     // print multidimensional array
-    for (int i = 0; i < 50; i++) {
-        for (int j = 0; j < 30; j++) {
-            std::cout << board[i][j] << " ";
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            cout << board[i][j] << " ";
         }
-        std::cout << std::endl;
+        cout << endl;
     }
 
     // free memory

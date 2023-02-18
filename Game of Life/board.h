@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <time.h>
+using namespace std;
 
 //  Generate an empty board using width and height parameters
 int **deadState(int width, int height)
@@ -45,6 +46,54 @@ int **randomState(int width, int height)
     }
 
     return state;
+}
+
+//  Calculate the next state of the board using Life's rules 
+int **nextBoardState(int** initialState, int width, int height)
+{
+    int **nextState = initialState;
+
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            int liveNeighbors = 0;
+
+            // Count the number of live neighbors for the current cell
+            for (int p = max(0, i - 1); p <= min(i + 1, height - 1); p++)
+            {
+                for (int q = max(0, j - 1); q <= min(j + 1, width - 1); q++)
+                {
+                    if (p != i || q != j)
+                    {
+                        liveNeighbors += initialState[p][q];
+                    }
+                }
+            }
+
+            // Apply the rules of the game to determine the new state of the cell
+            if (initialState[i][j] == 0)
+            {
+                if (liveNeighbors == 3)
+                {
+                    nextState[i][j] = 1;
+                }
+            }
+            else
+            {
+                if (liveNeighbors < 2 || liveNeighbors > 3)
+                {
+                    nextState[i][j] = 0;
+                }
+                else
+                {
+                    nextState[i][j] = 1;
+                }
+            }
+        }
+    }
+    
+    return nextState;
 }
 
 //  Pretty type the board changing the 0 to empty spaces and the 1 to #
