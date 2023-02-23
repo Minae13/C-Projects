@@ -1,19 +1,23 @@
 #include <cstdlib>
 #include <time.h>
+#include <iostream>
+#include <thread>
+#include <chrono>
 #include <windows.h>
-#include <unistd.h>
 using namespace std;
 
 //  Generate an empty board using width and height parameters
 int **deadState(int width, int height)
 {
+    // Allocate memory for the array of pointers
     int **boardState = new int *[height];
     for (int i = 0; i < height; i++)
     {
+        // Allocate memory for each row
         boardState[i] = new int[width];
         for (int j = 0; j < width; j++)
         {
-            boardState[i][j] = '0';
+            boardState[i][j] = 0; // Use 0 instead of '0' to initialize the cells as dead
         }
     }
     return boardState;
@@ -50,28 +54,50 @@ int **randomState(int width, int height)
     return state;
 }
 
+int countNeighbors(int** board, int row, int col, int width, int height) {
+    int count = 0;
+    // check top
+    if (row > 0 && board[row - 1][col]) count++;
+    // check bottom
+    if (row < height - 1 && board[row + 1][col]) count++;
+    // check left
+    if (col > 0 && board[row][col - 1]) count++;
+    // check right
+    if (col < width - 1 && board[row][col + 1]) count++;
+    // check top left
+    if (row > 0 && col > 0 && board[row - 1][col - 1]) count++;
+    // check top right
+    if (row > 0 && col < width - 1 && board[row - 1][col + 1]) count++;
+    // check bottom left
+    if (row < height - 1 && col > 0 && board[row + 1][col - 1]) count++;
+    // check bottom right
+    if (row < height - 1 && col < width - 1 && board[row + 1][col + 1]) count++;
+    return count;
+}
+
+
 //  Calculate the next state of the board using Life's rules
 int **nextBoardState(int **initialState, int width, int height)
 {
-    int **nextState = initialState;
+    int **nextState = deadState(width, height);
 
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
-            int liveNeighbors = 0;
+            int liveNeighbors = countNeighbors(initialState,i,j,width,height);
 
-            // Count the number of live neighbors for the current cell
-            for (int p = max(0, i - 1); p <= min(i + 1, height - 1); p++)
-            {
-                for (int q = max(0, j - 1); q <= min(j + 1, width - 1); q++)
-                {
-                    if (p != i || q != j)
-                    {
-                        liveNeighbors += initialState[p][q];
-                    }
-                }
-            }
+            // // Count the number of live neighbors for the current cell
+            // for (int p = max(0, i - 1); p <= min(i + 1, height - 1); p++)
+            // {
+            //     for (int q = max(0, j - 1); q <= min(j + 1, width - 1); q++)
+            //     {
+            //         if (p != i || q != j)
+            //         {
+            //             liveNeighbors += initialState[p][q];
+            //         }
+            //     }
+            // }
 
             // Apply the rules of the game to determine the new state of the cell
             if (initialState[i][j] == 0)
@@ -104,7 +130,7 @@ char **render(int **state, int width, int height)
     char **renderedState = new char *[height];
     for (int i = 0; i < height; i++)
     {
-        renderedState[i] = new char[width];
+        renderedState[i] = new char[width + 1]; // add 1 for the null terminator
         for (int j = 0; j < width; j++)
         {
             if (state[i][j] == 1)
@@ -116,18 +142,19 @@ char **render(int **state, int width, int height)
                 renderedState[i][j] = ' ';
             }
         }
+        renderedState[i][width] = '\0'; // null terminate the string
     }
 
     return renderedState;
 }
 
-//  Infinite loop
 void infinite(int width, int height)
 {
     int **boardState = randomState(width, height);
     char **renderedBoard = render(boardState, width, height);
     while (true)
     {
+        
         for (int i = 0; i < height; i++)
         {
             for (int j = 0; j < width; j++)
@@ -136,9 +163,31 @@ void infinite(int width, int height)
             }
             cout << endl;
         }
-        
-        boardState = nextBoardState(boardState, width, height);
+
+        // Calculate the next state of the board
+        int **nextState = nextBoardState(boardState, width, height);
+        // Free memory for the current state of the board
+        for (int i = 0; i < height; i++)
+        {
+            delete[] boardState[i];
+        }
+        delete[] boardState;
+
+        // Set the next state as the current state
+        boardState = nextState;
+        // Render the new state of the board
         renderedBoard = render(boardState, width, height);
-        sleep(0.999);
+
+        // Wait for one second before rendering the next frame
+        std::this_thread::sleep_for(std::chrono::milliseconds(90));
+
     }
+}
+
+void getWindowSize(int& columns, int& rows)
+{
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+    rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 }

@@ -2,121 +2,118 @@
 #include "board.h"
 using namespace std;
 
-void test(int **initialState, int height, int width, int **nextState)
-{
-    int **expectedState = new int *[height];
-    for (int i = 0; i < height; i++)
-    {
-        expectedState[i] = new int[width];
-        for (int j = 0; j < width; j++)
-        {
-            expectedState[i][j] = 0;
+void printMatrix(int **boardState) {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            cout << boardState[i][j];
         }
+        cout << endl;
     }
+}
 
-    for (int i = 0; i < height; i++)
-    {
-        for (int j = 0; j < width; j++)
-        {
-            int liveNeighbors = 0;
+void results(int testNum, int **initialState, int **expectedState, int **nextState) {
+    bool equal = true;
 
-            // Count the number of live neighbors for the current cell
-            for (int p = max(0, i - 1); p <= min(i + 1, height - 1); p++)
-            {
-                for (int q = max(0, j - 1); q <= min(j + 1, width - 1); q++)
-                {
-                    if (p != i || q != j)
-                    {
-                        liveNeighbors += initialState[p][q];
-                    }
-                }
-            }
-
-            // Apply the rules of the game to determine the new state of the cell
-            if (initialState[i][j] == 0)
-            {
-                if (liveNeighbors == 3)
-                {
-                    expectedState[i][j] = 1;
-                }
-            }
-            else
-            {
-                if (liveNeighbors < 2 || liveNeighbors > 3)
-                {
-                    expectedState[i][j] = 0;
-                }
-                else
-                {
-                    expectedState[i][j] = 1;
-                }
-            }
-        }
-    }
-
-    bool equal = false;
-    //  check if passed
-    for (int i = 0; i < height; i++)
-    {
-        for (int j = 0; j < width; j++)
-        {
-            if (expectedState[i][j] == nextState[i][j])
-            {
-                equal = true;
-            }
-            else
-            {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (expectedState[i][j] != nextState[i][j]){
                 equal = false;
             }
         }
     }
-
-    if (equal)
-    {
-        cout << "SUCCESS!!!" << endl;
+    
+    if (equal) {
+        cout << "TEST " << testNum << " PASSED !!" << endl;
     }
-    else
-    {
-        cout << "FAIL!!!" << endl
-             << "Expected Board:" << endl;
+    else {
+        cout << "TEST " << testNum << " FAILED !!" << endl;
+    }
+    cout << "Initial State:" << endl;
+        printMatrix(initialState);
+        cout << "Expected State:" << endl;
+        printMatrix(expectedState);
+        cout << "Your State:" << endl;
+        printMatrix(nextState);
+}
+    
+void test()
+{
+    int **initialState = deadState(3,3);
+    int **expectedState = deadState(3,3);
+    int **nextState = nextBoardState(initialState,3,3);
 
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                cout << expectedState[i][j] << " ";
+    // TEST 1: all dead cells remain dead
+    results(1,initialState,expectedState,nextState);
+
+    // TEST 2: dead cells with exactly 3 neighbors become alive
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if ((i == 0 && j == 2) || (i == 1 && (j == 1 || j == 2))) {
+                initialState[i][j] = 1;
+                expectedState[i][j] = 1;
+            } else if (i == 0 && j == 1){
+                expectedState[i][j] = 1;
             }
-            cout << endl;
-        }
-        cout << "Your results:";
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                cout << nextState[i][j] << " ";
-            }
-            cout << endl;
         }
     }
+    nextState = nextBoardState(initialState,3,3);
+    results(2,initialState,expectedState,nextState);
+
+    // TEST 3: live cells with 1 or 0 neighbors die
+    initialState = deadState(3,3);
+    expectedState = deadState(3,3);
+    
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if ((i == 0 && j == 0) || (i == 2 && j ==2)) {
+                initialState[i][j] = 1;
+            } else if (i == 1 && j == 1) {
+                initialState[i][j] = 1;
+                expectedState[i][j] = 1;
+            }
+        }
+    }
+    nextState = nextBoardState(initialState,3,3);
+    results(3,initialState,expectedState,nextState);
+
+    // TEST 4: live cells with 2 or 3 neighbors stay alive
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (i == 1 && j == 2) {
+                initialState[i][j] = 1;
+                expectedState[i][j] = 1;
+            } else if ((i == 0 && j == 1) || (i == 2 && j == 1) || (i == 2 && j ==2)){
+                expectedState[i][j] = 1;
+            }
+        }
+    }
+    nextState = nextBoardState(initialState,3,3);
+    results(4,initialState,expectedState,nextState);
+
+    // TEST 5: live cells with more than 3 neighbors die
+    initialState = deadState(3,3);
+    expectedState = deadState(3,3);
+
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            expectedState[i][j] = 1;
+
+            if ((i == 0 && j == 1) || (i == 1 && (j == 0 || j == 2)) || (i == 2 && j == 1)) {
+                initialState[i][j] = 1;
+            } else if (i == 1 && j == 1){
+                expectedState[i][j] = 0;
+                initialState[i][j] = 1;
+            }
+        }
+    }
+    nextState = nextBoardState(initialState,3,3);
+    results(5,initialState,expectedState,nextState);
+
 }
 
 int main()
 {
-    int width = 3;
-    int height = 3;
-
-    int **initialState = randomState(width,height);
-    int **nextState = nextBoardState(initialState,width,height);
-    test(initialState, width,height, nextState);
-
-    // free memory
-    for (int i = 0; i < 3; i++)
-    {
-        delete[] initialState[i];
-        delete[] nextState[i];
-    }
-    delete[] initialState;
-    delete[] nextState;
+    test();
 
     return 0;
 }
