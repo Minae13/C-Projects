@@ -1,9 +1,8 @@
-#include <cstdlib>
-#include <time.h>
+#include <Windows.h>
+#include <random>
 #include <iostream>
 #include <thread>
 #include <chrono>
-#include <windows.h>
 using namespace std;
 
 //  Generate an empty board using width and height parameters
@@ -17,7 +16,7 @@ int **deadState(int width, int height)
         boardState[i] = new int[width];
         for (int j = 0; j < width; j++)
         {
-            boardState[i][j] = 0; // Use 0 instead of '0' to initialize the cells as dead
+            boardState[i][j] = 0;
         }
     }
     return boardState;
@@ -26,15 +25,15 @@ int **deadState(int width, int height)
 //  Generate random integer and then turn it into 0 or 1
 int randomInt()
 {
-    int randomValue = rand();
-    if (randomValue % 2 == 0 || randomValue % 3 == 0 || randomValue % 5 == 0)
-    {
-        return 0;
-    }
-    else
-    {
-        return 1;
-    }
+    // Create a random device to seed the generator
+    std::random_device rd;
+    // Create a Mersenne Twister engine
+    std::mt19937 gen(rd());
+    // Create a uniform distribution that produces either 0 or 1
+    std::uniform_int_distribution<> dis(0, 1);
+
+    // Generate a random number using the distribution and return it
+    return dis(gen);
 }
 
 //  Initialise the pregenerated board with the random 0 and 1 using the previous function
@@ -52,6 +51,12 @@ int **randomState(int width, int height)
     }
 
     return state;
+
+    for (int i = 0; i < height; i++)
+        {
+            delete[] state[i];
+        }
+        delete[] state;
 }
 
 int countNeighbors(int** board, int row, int col, int width, int height) {
@@ -86,18 +91,6 @@ int **nextBoardState(int **initialState, int width, int height)
         for (int j = 0; j < width; j++)
         {
             int liveNeighbors = countNeighbors(initialState,i,j,width,height);
-
-            // // Count the number of live neighbors for the current cell
-            // for (int p = max(0, i - 1); p <= min(i + 1, height - 1); p++)
-            // {
-            //     for (int q = max(0, j - 1); q <= min(j + 1, width - 1); q++)
-            //     {
-            //         if (p != i || q != j)
-            //         {
-            //             liveNeighbors += initialState[p][q];
-            //         }
-            //     }
-            // }
 
             // Apply the rules of the game to determine the new state of the cell
             if (initialState[i][j] == 0)
@@ -179,15 +172,14 @@ void infinite(int width, int height)
         renderedBoard = render(boardState, width, height);
 
         // Wait for one second before rendering the next frame
-        std::this_thread::sleep_for(std::chrono::milliseconds(90));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     }
 }
 
-void getWindowSize(int& columns, int& rows)
-{
+void getWindowSize(int& width, int& height) {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-    columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+    width = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+    height = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 }

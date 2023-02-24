@@ -6,10 +6,9 @@ using namespace std;
 
 int main()
 {
-    int horizontal = 0;
-    int vertical = 0;
-    getWindowSize(vertical,horizontal);
-    infinite(horizontal,vertical);
+    int width, height;
+    getWindowSize(width, height);
+    infinite(width, height);
 
     return 0;
 }
