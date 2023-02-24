@@ -53,33 +53,49 @@ int **randomState(int width, int height)
     return state;
 
     for (int i = 0; i < height; i++)
-        {
-            delete[] state[i];
-        }
-        delete[] state;
+    {
+        delete[] state[i];
+    }
+    delete[] state;
 }
 
-int countNeighbors(int** board, int row, int col, int width, int height) {
+int countNeighbors(int **board, int row, int col, int width, int height)
+{
     int count = 0;
-    // check top
-    if (row > 0 && board[row - 1][col]) count++;
-    // check bottom
-    if (row < height - 1 && board[row + 1][col]) count++;
-    // check left
-    if (col > 0 && board[row][col - 1]) count++;
-    // check right
-    if (col < width - 1 && board[row][col + 1]) count++;
-    // check top left
-    if (row > 0 && col > 0 && board[row - 1][col - 1]) count++;
-    // check top right
-    if (row > 0 && col < width - 1 && board[row - 1][col + 1]) count++;
-    // check bottom left
-    if (row < height - 1 && col > 0 && board[row + 1][col - 1]) count++;
-    // check bottom right
-    if (row < height - 1 && col < width - 1 && board[row + 1][col + 1]) count++;
+    // check top (unless cell in top row)
+    if (row > 0 && board[row - 1][col])
+        count++;
+
+    // check bottom (unless cell in bottom row)
+    if (row < height - 1 && board[row + 1][col])
+        count++;
+
+    // check left (unless cell in left column)
+    if (col > 0 && board[row][col - 1])
+        count++;
+
+    // check right (unless cell in right column)
+    if (col < width - 1 && board[row][col + 1])
+        count++;
+
+    // check top left (unless cell in top-left corner)
+    if (row > 0 && col > 0 && board[row - 1][col - 1])
+        count++;
+
+    // check top right (unless cell in top-right corner)
+    if (row > 0 && col < width - 1 && board[row - 1][col + 1])
+        count++;
+
+    // check bottom left (unless cell in bottom-left corner)
+    if (row < height - 1 && col > 0 && board[row + 1][col - 1])
+        count++;
+
+    // check bottom right (unless cell in bottom-right corner)
+    if (row < height - 1 && col < width - 1 && board[row + 1][col + 1])
+        count++;
+
     return count;
 }
-
 
 //  Calculate the next state of the board using Life's rules
 int **nextBoardState(int **initialState, int width, int height)
@@ -90,7 +106,7 @@ int **nextBoardState(int **initialState, int width, int height)
     {
         for (int j = 0; j < width; j++)
         {
-            int liveNeighbors = countNeighbors(initialState,i,j,width,height);
+            int liveNeighbors = countNeighbors(initialState, i, j, width, height);
 
             // Apply the rules of the game to determine the new state of the cell
             if (initialState[i][j] == 0)
@@ -147,7 +163,7 @@ void infinite(int width, int height)
     char **renderedBoard = render(boardState, width, height);
     while (true)
     {
-        
+
         for (int i = 0; i < height; i++)
         {
             for (int j = 0; j < width; j++)
@@ -172,12 +188,12 @@ void infinite(int width, int height)
         renderedBoard = render(boardState, width, height);
 
         // Wait for one second before rendering the next frame
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
+        std::this_thread::sleep_for(std::chrono::milliseconds(90));
     }
 }
 
-void getWindowSize(int& width, int& height) {
+void getWindowSize(int &width, int &height)
+{
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
     width = csbi.srWindow.Right - csbi.srWindow.Left + 1;

@@ -1,6 +1,5 @@
 #include <iostream>
-#include <wtypes.h>
-#include <windows.h>
+#include <Windows.h>
 #include "board.h"
 using namespace std;
 
