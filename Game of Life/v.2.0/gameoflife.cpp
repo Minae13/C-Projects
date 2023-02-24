@@ -7,7 +7,9 @@ int main()
 {
     int width, height;
     getWindowSize(width, height);
-    infinite(width, height);
+    Board game(width, height);
+    game.randomize();
+    game.run();
 
     return 0;
 }

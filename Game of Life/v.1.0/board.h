@@ -61,22 +61,38 @@ int **randomState(int width, int height)
 
 int countNeighbors(int** board, int row, int col, int width, int height) {
     int count = 0;
-    // check top
-    if (row > 0 && board[row - 1][col]) count++;
-    // check bottom
-    if (row < height - 1 && board[row + 1][col]) count++;
-    // check left
-    if (col > 0 && board[row][col - 1]) count++;
-    // check right
-    if (col < width - 1 && board[row][col + 1]) count++;
-    // check top left
-    if (row > 0 && col > 0 && board[row - 1][col - 1]) count++;
-    // check top right
-    if (row > 0 && col < width - 1 && board[row - 1][col + 1]) count++;
-    // check bottom left
-    if (row < height - 1 && col > 0 && board[row + 1][col - 1]) count++;
-    // check bottom right
-    if (row < height - 1 && col < width - 1 && board[row + 1][col + 1]) count++;
+    // check top (unless cell in top row)
+    if (row > 0 && board[row - 1][col])
+        count++;
+
+    // check bottom (unless cell in bottom row)
+    if (row < height - 1 && board[row + 1][col])
+        count++;
+
+    // check left (unless cell in left column)
+    if (col > 0 && board[row][col - 1])
+        count++;
+
+    // check right (unless cell in right column)
+    if (col < width - 1 && board[row][col + 1])
+        count++;
+
+    // check top left (unless cell in top-left corner)
+    if (row > 0 && col > 0 && board[row - 1][col - 1])
+        count++;
+
+    // check top right (unless cell in top-right corner)
+    if (row > 0 && col < width - 1 && board[row - 1][col + 1])
+        count++;
+
+    // check bottom left (unless cell in bottom-left corner)
+    if (row < height - 1 && col > 0 && board[row + 1][col - 1])
+        count++;
+
+    // check bottom right (unless cell in bottom-right corner)
+    if (row < height - 1 && col < width - 1 && board[row + 1][col + 1])
+        count++;
+
     return count;
 }
 
